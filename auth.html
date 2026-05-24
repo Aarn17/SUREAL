@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In — SUREAL</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <style>
+    body { display: flex; flex-direction: column; min-height: 100vh; }
+
+    .auth-page {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 100vh;
+    }
+
+    /* ── Visual Side ─── */
+    .auth-visual {
+      position: relative;
+      background: var(--dark-1);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: var(--space-2xl);
+      overflow: hidden;
+    }
+
+    .auth-visual-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 30% 40%, rgba(200,169,110,0.08) 0%, transparent 60%),
+        linear-gradient(180deg, var(--dark-1) 0%, var(--black) 100%);
+    }
+
+    .auth-visual-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+
+    .auth-visual-big {
+      font-family: var(--font-display);
+      font-size: clamp(80px, 14vw, 200px);
+      color: rgba(255,255,255,0.04);
+      line-height: 1;
+      letter-spacing: 0.04em;
+      user-select: none;
+      position: relative;
+      z-index: 1;
+    }
+
+    .auth-visual-bottom {
+      position: relative;
+      z-index: 1;
+    }
+
+    .auth-brand-logo {
+      font-family: var(--font-display);
+      font-size: 40px;
+      letter-spacing: 0.12em;
+      color: var(--white);
+    }
+
+    .auth-brand-logo span { color: var(--gold); }
+
+    .auth-visual-quote {
+      font-family: var(--font-heading);
+      font-size: 18px;
+      font-weight: 300;
+      color: var(--gray-light);
+      line-height: 1.6;
+      max-width: 300px;
+      margin-top: var(--space-md);
+    }
+
+    /* ── Form Side ─── */
+    .auth-form-side {
+      background: var(--black);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: var(--space-3xl) clamp(var(--space-xl), 6vw, var(--space-3xl));
+      border-left: 1px solid var(--glass-border);
+    }
+
+    .auth-tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: var(--space-2xl);
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .auth-tab {
+      padding: 12px 0;
+      margin-right: var(--space-xl);
+      font-family: var(--font-heading);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--gray-dim);
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: color var(--t-fast), border-color var(--t-fast);
+    }
+
+    .auth-tab.active {
+      color: var(--white);
+      border-bottom-color: var(--gold);
+    }
+
+    .auth-tab:hover:not(.active) { color: var(--gray-light); }
+
+    .auth-panel { display: none; animation: fade-up 0.4s var(--ease-smooth) both; }
+    .auth-panel.active { display: block; }
+
+    .auth-title {
+      font-family: var(--font-display);
+      font-size: clamp(36px, 4vw, 52px);
+      letter-spacing: 0.06em;
+      color: var(--white);
+      margin-bottom: var(--space-sm);
+    }
+
+    .auth-subtitle {
+      font-size: 14px;
+      color: var(--gray-mid);
+      margin-bottom: var(--space-xl);
+      line-height: 1.6;
+    }
+
+    .auth-divider {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      margin: var(--space-lg) 0;
+      color: var(--gray-dim);
+      font-size: 12px;
+      letter-spacing: 0.1em;
+    }
+
+    .auth-divider::before,
+    .auth-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--glass-border);
+    }
+
+    .auth-switch {
+      margin-top: var(--space-lg);
+      text-align: center;
+      font-size: 13px;
+      color: var(--gray-mid);
+    }
+
+    .auth-switch a {
+      color: var(--gold);
+      font-weight: 600;
+      transition: color var(--t-fast);
+    }
+
+    .auth-switch a:hover { color: var(--gold-light); }
+
+    .password-wrap {
+      position: relative;
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gray-dim);
+      transition: color var(--t-fast);
+    }
+
+    .password-toggle:hover { color: var(--white); }
+
+    /* Forgot password panel */
+    .forgot-panel {
+      display: none;
+      animation: fade-up 0.4s var(--ease-smooth) both;
+    }
+
+    .forgot-panel.active { display: block; }
+
+    @media (max-width: 800px) {
+      .auth-page { grid-template-columns: 1fr; }
+      .auth-visual { display: none; }
+      .auth-form-side { padding: calc(var(--nav-height) + 40px) var(--gutter) var(--space-2xl); border-left: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="cursor-dot" id="cursor-dot"></div>
+  <div class="cursor-ring" id="cursor-ring"></div>
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Minimal Nav -->
+  <nav style="position:fixed;top:0;left:0;right:0;z-index:100;padding:20px var(--gutter);display:flex;align-items:center;justify-content:space-between;">
+    <a href="index.html" class="nav-logo" style="font-family:var(--font-display);font-size:24px;letter-spacing:0.12em;color:var(--white);">SUR<span style="color:var(--gold);">E</span>AL</a>
+    <a href="shop.html" class="btn btn-ghost btn-sm">Back to Shop</a>
+  </nav>
+
+  <div class="auth-page page-transition">
+
+    <!-- Visual -->
+    <div class="auth-visual">
+      <div class="auth-visual-bg"></div>
+      <div class="auth-visual-grid"></div>
+      <div class="auth-visual-big">SR</div>
+      <div class="auth-visual-bottom">
+        <div class="auth-brand-logo">SUR<span>E</span>AL</div>
+        <p class="auth-visual-quote">
+          "Where creativity meets the street. Every piece tells your story."
+        </p>
+      </div>
+    </div>
+
+    <!-- Form -->
+    <div class="auth-form-side">
+
+      <!-- Tabs -->
+      <div class="auth-tabs" id="auth-tabs">
+        <button class="auth-tab active" onclick="switchTab('login')">Sign In</button>
+        <button class="auth-tab" onclick="switchTab('register')">Create Account</button>
+      </div>
+
+      <!-- Login Panel -->
+      <div class="auth-panel active" id="panel-login">
+        <h1 class="auth-title">WELCOME<br>BACK.</h1>
+        <p class="auth-subtitle">Sign in to access your account, orders and wishlist.</p>
+
+        <form id="login-form" novalidate>
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-input" id="login-email" placeholder="your@email.com" required autocomplete="email">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <div class="password-wrap">
+              <input type="password" class="form-input" id="login-password" placeholder="••••••••" required autocomplete="current-password" style="padding-right:48px;">
+              <button type="button" class="password-toggle" onclick="togglePw('login-password', this)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div style="display:flex; justify-content:flex-end; margin-bottom:var(--space-lg);">
+            <button type="button" class="btn-ghost btn-sm" style="font-size:12px; color:var(--gray-mid); padding:0;" onclick="switchTab('forgot')">
+              Forgot password?
+            </button>
+          </div>
+
+          <div id="login-error" class="form-error" style="display:none; margin-bottom:12px;"></div>
+
+          <button type="submit" class="btn btn-primary btn-full btn-lg">
+            Sign In →
+          </button>
+        </form>
+
+        <div class="auth-switch">
+          Don't have an account? <a href="#" onclick="switchTab('register'); return false;">Create one →</a>
+        </div>
+      </div>
+
+      <!-- Register Panel -->
+      <div class="auth-panel" id="panel-register">
+        <h1 class="auth-title">JOIN<br>SUREAL.</h1>
+        <p class="auth-subtitle">Create your account to save pieces, track orders and request customs.</p>
+
+        <form id="register-form" novalidate>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:var(--space-md);">
+            <div class="form-group">
+              <label class="form-label">First Name</label>
+              <input type="text" class="form-input" id="reg-fname" placeholder="Enzo" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Last Name</label>
+              <input type="text" class="form-input" id="reg-lname" placeholder="Rossi" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-input" id="reg-email" placeholder="your@email.com" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <div class="password-wrap">
+              <input type="password" class="form-input" id="reg-password" placeholder="Min. 8 characters" required style="padding-right:48px;">
+              <button type="button" class="password-toggle" onclick="togglePw('reg-password', this)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Password strength -->
+          <div style="margin-bottom:var(--space-md);">
+            <div style="display:flex; gap:4px; margin-bottom:6px;">
+              <div class="pw-bar" style="height:3px; flex:1; background:var(--dark-3); border-radius:2px; transition:background 0.3s;"></div>
+              <div class="pw-bar" style="height:3px; flex:1; background:var(--dark-3); border-radius:2px; transition:background 0.3s;"></div>
+              <div class="pw-bar" style="height:3px; flex:1; background:var(--dark-3); border-radius:2px; transition:background 0.3s;"></div>
+              <div class="pw-bar" style="height:3px; flex:1; background:var(--dark-3); border-radius:2px; transition:background 0.3s;"></div>
+            </div>
+            <div class="pw-label" style="font-size:11px; color:var(--gray-dim);"></div>
+          </div>
+
+          <div style="display:flex; align-items:flex-start; gap:10px; margin-bottom:var(--space-lg);">
+            <input type="checkbox" id="reg-terms" style="width:16px;height:16px;margin-top:2px;accent-color:var(--gold);flex-shrink:0;">
+            <label for="reg-terms" style="font-size:12px; color:var(--gray-mid); line-height:1.5; cursor:none;">
+              I agree to the <a href="#" style="color:var(--gold);">Terms of Service</a> and <a href="#" style="color:var(--gold);">Privacy Policy</a>.
+            </label>
+          </div>
+
+          <div id="reg-error" class="form-error" style="display:none; margin-bottom:12px;"></div>
+
+          <button type="submit" class="btn btn-primary btn-full btn-lg">
+            Create Account →
+          </button>
+        </form>
+
+        <div class="auth-switch">
+          Already have an account? <a href="#" onclick="switchTab('login'); return false;">Sign in →</a>
+        </div>
+      </div>
+
+      <!-- Forgot Password Panel -->
+      <div class="forgot-panel" id="panel-forgot">
+        <button onclick="switchTab('login')" style="display:flex; align-items:center; gap:8px; font-family:var(--font-heading); font-size:12px; color:var(--gray-mid); margin-bottom:var(--space-xl); transition:color 0.2s;" onmouseenter="this.style.color='var(--white)'" onmouseleave="this.style.color='var(--gray-mid)'">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          Back to Sign In
+        </button>
+        <h1 class="auth-title">RESET<br>PASSWORD.</h1>
+        <p class="auth-subtitle">Enter your email and we'll send you a reset link.</p>
+        <form id="forgot-form" novalidate>
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-input" id="forgot-email" placeholder="your@email.com" required>
+          </div>
+          <button type="submit" class="btn btn-primary btn-full btn-lg">Send Reset Link →</button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="js/products.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/animations.js"></script>
+
+  <script>
+    /* Redirect if already logged in */
+    if (Auth.isLoggedIn()) window.location.href = 'account.html';
+
+    function switchTab(tab) {
+      const tabs    = document.querySelectorAll('.auth-tab');
+      const panels  = ['login','register'];
+
+      /* Hide all panels */
+      panels.forEach(p => {
+        const el = document.getElementById('panel-' + p);
+        if (el) el.classList.remove('active');
+      });
+      document.getElementById('panel-forgot')?.classList.remove('active');
+
+      if (tab === 'forgot') {
+        tabs.forEach(t => t.classList.remove('active'));
+        document.getElementById('panel-forgot').classList.add('active');
+        return;
+      }
+
+      tabs.forEach((t, i) => {
+        const targets = ['login','register'];
+        t.classList.toggle('active', targets[i] === tab);
+      });
+      document.getElementById('panel-' + tab).classList.add('active');
+    }
+
+    function togglePw(inputId, btn) {
+      const inp = document.getElementById(inputId);
+      const isText = inp.type === 'text';
+      inp.type = isText ? 'password' : 'text';
+      btn.style.color = isText ? 'var(--gray-dim)' : 'var(--gold)';
+    }
+
+    /* Password strength */
+    document.getElementById('reg-password')?.addEventListener('input', e => {
+      const pw = e.target.value;
+      const bars = document.querySelectorAll('.pw-bar');
+      const label = document.querySelector('.pw-label');
+
+      let strength = 0;
+      if (pw.length >= 8) strength++;
+      if (/[A-Z]/.test(pw)) strength++;
+      if (/[0-9]/.test(pw)) strength++;
+      if (/[^a-zA-Z0-9]/.test(pw)) strength++;
+
+      const colors = ['', '#FF6B6B', '#FFA500', '#C8A96E', '#4CAF50'];
+      const labels = ['', 'Weak', 'Fair', 'Good', 'Strong'];
+      bars.forEach((bar, i) => {
+        bar.style.background = i < strength ? colors[strength] : 'var(--dark-3)';
+      });
+      if (label) {
+        label.textContent = pw.length > 0 ? labels[strength] : '';
+        label.style.color = colors[strength];
+      }
+    });
+
+    /* Login */
+    document.getElementById('login-form').addEventListener('submit', e => {
+      e.preventDefault();
+      const email    = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+      const errEl    = document.getElementById('login-error');
+
+      const result = Auth.login({ email, password });
+      if (result.ok) {
+        Cart.showToast('Welcome back, ' + result.user.name + '!', 'success');
+        setTimeout(() => window.location.href = 'account.html', 800);
+      } else {
+        errEl.textContent = result.error;
+        errEl.style.display = 'block';
+      }
+    });
+
+    /* Register */
+    document.getElementById('register-form').addEventListener('submit', e => {
+      e.preventDefault();
+      const fname    = document.getElementById('reg-fname').value.trim();
+      const lname    = document.getElementById('reg-lname').value.trim();
+      const email    = document.getElementById('reg-email').value.trim();
+      const password = document.getElementById('reg-password').value;
+      const terms    = document.getElementById('reg-terms').checked;
+      const errEl    = document.getElementById('reg-error');
+
+      if (!terms) { errEl.textContent = 'Please accept the terms.'; errEl.style.display='block'; return; }
+
+      const result = Auth.register({ name: fname + ' ' + lname, email, password });
+      if (result.ok) {
+        Cart.showToast('Account created! Welcome to SUREAL.', 'success');
+        setTimeout(() => window.location.href = 'account.html', 800);
+      } else {
+        errEl.textContent = result.error;
+        errEl.style.display = 'block';
+      }
+    });
+
+    /* Forgot */
+    document.getElementById('forgot-form').addEventListener('submit', e => {
+      e.preventDefault();
+      const email = document.getElementById('forgot-email').value.trim();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        Cart.showToast('Please enter a valid email.', 'error'); return;
+      }
+      Cart.showToast('Reset link sent if account exists.', 'info');
+      setTimeout(() => switchTab('login'), 1500);
+    });
+  </script>
+</body>
+</html>

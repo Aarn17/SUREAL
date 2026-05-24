@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product — SUREAL</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <style>
+    .product-page {
+      padding-top: var(--nav-height);
+      min-height: 100vh;
+    }
+
+    .breadcrumb {
+      padding: 20px 0 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      color: var(--gray-dim);
+      text-transform: uppercase;
+    }
+    .breadcrumb a { color: var(--gray-dim); transition: color var(--t-fast); }
+    .breadcrumb a:hover { color: var(--white); }
+    .breadcrumb span { color: var(--gray-mid); }
+
+    /* ── Product Layout ───────────────────────── */
+    .product-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+      margin-top: var(--space-lg);
+    }
+
+    /* ── Gallery ──────────────────────────────── */
+    .product-gallery {
+      position: sticky;
+      top: var(--nav-height);
+      height: calc(100vh - var(--nav-height));
+      overflow: hidden;
+      background: var(--dark-1);
+    }
+
+    .gallery-main {
+      width: 100%;
+      height: 75%;
+      position: relative;
+      overflow: hidden;
+      background: var(--dark-2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .gallery-main img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform var(--t-xl) var(--ease-smooth), opacity var(--t-med);
+    }
+
+    .gallery-main img.switching {
+      opacity: 0;
+      transform: scale(1.04);
+    }
+
+    .gallery-main .product-img-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(145deg, var(--dark-2), var(--dark-3));
+    }
+
+    .gallery-main .placeholder-label {
+      font-size: 64px;
+    }
+
+    .gallery-zoom-hint {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      background: var(--glass-dark);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-pill);
+      padding: 6px 14px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      color: var(--gray-mid);
+      pointer-events: none;
+    }
+
+    .gallery-thumbs {
+      height: 25%;
+      display: flex;
+      gap: 2px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      background: var(--dark-1);
+    }
+
+    .gallery-thumbs::-webkit-scrollbar { display: none; }
+
+    .gallery-thumb {
+      flex-shrink: 0;
+      width: calc(100% / 3);
+      min-width: 80px;
+      height: 100%;
+      overflow: hidden;
+      background: var(--dark-2);
+      cursor: none;
+      position: relative;
+      transition: opacity var(--t-fast);
+    }
+
+    .gallery-thumb::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border: 2px solid transparent;
+      transition: border-color var(--t-fast);
+    }
+
+    .gallery-thumb.active::after { border-color: var(--gold); }
+    .gallery-thumb:not(.active) { opacity: 0.5; }
+    .gallery-thumb:hover { opacity: 0.8; }
+
+    .gallery-thumb img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+
+    .gallery-thumb .product-img-placeholder {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .gallery-thumb .placeholder-label { font-size: 14px; }
+
+    /* ── Product Info ──────────────────────────── */
+    .product-info-panel {
+      padding: var(--space-xl) var(--space-2xl);
+      background: var(--black);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-lg);
+    }
+
+    .product-info-top {}
+
+    .product-badges {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: var(--space-md);
+    }
+
+    .product-main-name {
+      font-family: var(--font-heading);
+      font-size: clamp(28px, 3.5vw, 44px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      color: var(--white);
+      margin-bottom: var(--space-md);
+    }
+
+    .product-main-price {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      margin-bottom: var(--space-sm);
+    }
+
+    .price-current {
+      font-family: var(--font-display);
+      font-size: 40px;
+      color: var(--white);
+      letter-spacing: 0.04em;
+    }
+
+    .price-original {
+      font-family: var(--font-mono);
+      font-size: 18px;
+      color: var(--gray-dim);
+      text-decoration: line-through;
+    }
+
+    .price-save {
+      background: var(--gold);
+      color: var(--black);
+      padding: 3px 8px;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-heading);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+    }
+
+    .product-divider {
+      height: 1px;
+      background: var(--glass-border);
+      margin: var(--space-md) 0;
+    }
+
+    /* Size selector */
+    .size-label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-sm);
+    }
+
+    .size-guide-link {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      color: var(--gray-mid);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      transition: color var(--t-fast);
+    }
+
+    .size-guide-link:hover { color: var(--white); }
+
+    /* Quantity */
+    .qty-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .qty-control {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      background: var(--dark-1);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .qty-btn {
+      width: 44px; height: 44px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      color: var(--gray-light);
+      transition: all var(--t-fast);
+    }
+
+    .qty-btn:hover { background: var(--glass-bg-hover); color: var(--white); }
+
+    .qty-display {
+      min-width: 44px;
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 15px;
+      border-left: 1px solid var(--glass-border);
+      border-right: 1px solid var(--glass-border);
+      padding: 0 8px;
+      height: 44px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* Add to cart */
+    .atc-row {
+      display: flex;
+      gap: var(--space-sm);
+    }
+
+    .btn-atc {
+      flex: 1;
+      padding: 16px;
+      font-size: 14px;
+      letter-spacing: 0.1em;
+    }
+
+    /* Product description */
+    .product-description {
+      font-size: 15px;
+      color: var(--gray-light);
+      line-height: 1.8;
+    }
+
+    /* Accordion details */
+    .accordion-item {
+      border-top: 1px solid var(--glass-border);
+    }
+
+    .accordion-trigger {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-md) 0;
+      font-family: var(--font-heading);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--white);
+      transition: color var(--t-fast);
+    }
+
+    .accordion-trigger:hover { color: var(--gold); }
+
+    .accordion-icon {
+      transition: transform var(--t-med) var(--ease-smooth);
+      flex-shrink: 0;
+    }
+
+    .accordion-item.open .accordion-icon { transform: rotate(45deg); }
+
+    .accordion-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height var(--t-med) var(--ease-smooth), padding var(--t-med);
+    }
+
+    .accordion-item.open .accordion-body { max-height: 400px; padding-bottom: var(--space-md); }
+
+    .accordion-body ul {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .accordion-body li {
+      font-size: 14px;
+      color: var(--gray-light);
+      line-height: 1.6;
+      padding-left: 16px;
+      position: relative;
+    }
+
+    .accordion-body li::before {
+      content: '—';
+      position: absolute;
+      left: 0;
+      color: var(--gold);
+      font-size: 12px;
+    }
+
+    /* Trust badges */
+    .trust-badges {
+      display: flex;
+      gap: var(--space-md);
+      flex-wrap: wrap;
+    }
+
+    .trust-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-heading);
+      font-size: 12px;
+      color: var(--gray-mid);
+    }
+
+    .trust-badge svg { color: var(--gold); }
+
+    /* ── Related Products ─────────────────────── */
+    .related-section {
+      padding: var(--space-3xl) 0;
+      background: var(--black-soft);
+      border-top: 1px solid var(--glass-border);
+    }
+
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2px;
+      margin-top: var(--space-xl);
+    }
+
+    /* ── Responsive ───────────────────────────── */
+    @media (max-width: 900px) {
+      .product-layout { grid-template-columns: 1fr; }
+      .product-gallery { position: relative; height: auto; }
+      .gallery-main { height: 70vw; max-height: 500px; }
+      .gallery-thumbs { height: 80px; }
+      .product-info-panel { padding: var(--space-xl) var(--gutter); }
+      .related-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 500px) {
+      .related-grid { grid-template-columns: repeat(2, 1fr); }
+      .atc-row { flex-direction: column; }
+      .btn-icon { align-self: stretch; height: 50px; border-radius: var(--radius-md); }
+    }
+  </style>
+</head>
+<body>
+  <div class="scroll-progress"></div>
+  <div class="cursor-dot" id="cursor-dot"></div>
+  <div class="cursor-ring" id="cursor-ring"></div>
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Cart Drawer -->
+  <div class="cart-overlay" id="cart-overlay"></div>
+  <div class="cart-drawer" id="cart-drawer">
+    <div class="cart-drawer-header">
+      <div class="cart-drawer-title t-display">CART</div>
+      <button class="cart-close" id="cart-close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="cart-empty hidden" id="cart-empty">
+      <div class="cart-empty-icon">◻</div>
+      <div style="text-align:center"><div class="t-heading" style="font-size:18px;margin-bottom:8px;">Cart is empty</div><p class="t-dim" style="font-size:14px;margin-bottom:24px;">Add a piece to get started</p></div>
+    </div>
+    <div class="cart-items" id="cart-items-list"></div>
+    <div class="cart-footer hidden" id="cart-footer">
+      <div class="cart-subtotal">
+        <span class="cart-subtotal-label">Subtotal</span>
+        <span class="cart-subtotal-value" id="cart-subtotal-value">€0.00</span>
+      </div>
+      <p style="font-size:12px;color:var(--gray-dim);margin-bottom:16px;">Shipping calculated at checkout</p>
+      <button class="btn btn-primary btn-full btn-lg" id="cart-checkout-btn">Checkout →</button>
+    </div>
+  </div>
+
+  <!-- Nav -->
+  <nav class="nav scrolled" id="main-nav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">SUR<span>E</span>AL</a>
+      <div class="nav-links">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="shop.html" class="nav-link active">Shop</a>
+        <a href="about.html" class="nav-link">About</a>
+        <a href="contact.html" class="nav-link">Contact</a>
+      </div>
+      <div class="nav-actions">
+        <a href="auth.html" class="nav-icon-btn" id="nav-account-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></a>
+        <button class="nav-icon-btn" data-open-cart style="position:relative;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+          <span class="cart-count" id="cart-count-nav">0</span>
+        </button>
+        <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="mobile-nav" id="mobile-nav">
+    <div class="mobile-nav-links">
+      <a href="index.html" class="mobile-nav-link">Home</a>
+      <a href="shop.html" class="mobile-nav-link">Shop</a>
+      <a href="about.html" class="mobile-nav-link">About</a>
+      <a href="contact.html" class="mobile-nav-link">Contact</a>
+    </div>
+  </div>
+
+  <!-- ═══════ MAIN ═══════ -->
+  <main class="product-page page-transition">
+    <div class="container">
+      <div class="breadcrumb">
+        <a href="index.html">Home</a>
+        <span>›</span>
+        <a href="shop.html">Shop</a>
+        <span>›</span>
+        <span id="breadcrumb-name" style="color:var(--white);">Product</span>
+      </div>
+    </div>
+
+    <div class="product-layout">
+      <!-- Gallery -->
+      <div class="product-gallery">
+        <div class="gallery-main" id="gallery-main">
+          <div class="product-img-placeholder">
+            <span class="placeholder-label" id="gallery-placeholder-text">LOADING...</span>
+          </div>
+          <div class="gallery-zoom-hint">HOVER TO ZOOM</div>
+        </div>
+        <div class="gallery-thumbs" id="gallery-thumbs">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Info Panel -->
+      <div class="product-info-panel">
+        <div class="product-info-top">
+          <div class="product-badges">
+            <span class="badge badge-gold" id="product-badge-tag" style="display:none;"></span>
+            <span class="badge badge-white">Handcrafted</span>
+          </div>
+
+          <h1 class="product-main-name" id="product-main-name">Loading...</h1>
+
+          <div class="product-main-price">
+            <span class="price-current" id="price-current">€0.00</span>
+            <span class="price-original" id="price-original" style="display:none;"></span>
+            <span class="price-save" id="price-save" style="display:none;"></span>
+          </div>
+
+          <p class="product-description" id="product-description" style="font-size:14px; color:var(--gray-mid); margin-top:4px;">
+            <!-- filled by JS -->
+          </p>
+        </div>
+
+        <div class="product-divider"></div>
+
+        <!-- Size Selector -->
+        <div>
+          <div class="size-label-row">
+            <span class="t-label">Select Size</span>
+            <a href="#" class="size-guide-link">Size Guide ↗</a>
+          </div>
+          <div class="size-grid" id="size-grid">
+            <!-- Populated by JS -->
+          </div>
+          <div id="size-error" style="display:none; font-size:12px; color:#FF6B6B; margin-top:8px;">
+            Please select a size
+          </div>
+        </div>
+
+        <!-- Quantity -->
+        <div>
+          <div class="t-label" style="margin-bottom:12px;">Quantity</div>
+          <div class="qty-row">
+            <div class="qty-control">
+              <button class="qty-btn" id="qty-minus">−</button>
+              <div class="qty-display" id="qty-display">1</div>
+              <button class="qty-btn" id="qty-plus">+</button>
+            </div>
+            <span class="t-caption" style="color:var(--gray-dim); margin-left:8px;">In Stock</span>
+          </div>
+        </div>
+
+        <!-- Add to Cart -->
+        <div class="atc-row">
+          <button class="btn btn-primary btn-atc btn-lg" id="atc-btn">
+            Add to Cart
+          </button>
+          <button class="btn btn-icon" id="wishlist-btn" title="Save to Wishlist">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Trust Badges -->
+        <div class="trust-badges">
+          <div class="trust-badge">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Secure Checkout
+          </div>
+          <div class="trust-badge">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 3h22l-2 9H3L1 3z"/><path d="M16 16a2 2 0 1 0 4 0 2 2 0 0 0-4 0"/><path d="M6 16a2 2 0 1 0 4 0 2 2 0 0 0-4 0"/></svg>
+            Free Shipping €150+
+          </div>
+          <div class="trust-badge">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.79"/></svg>
+            14-Day Returns
+          </div>
+        </div>
+
+        <div class="product-divider"></div>
+
+        <!-- Accordion: Details -->
+        <div class="accordion-item open" id="acc-details">
+          <button class="accordion-trigger" onclick="toggleAccordion('acc-details')">
+            Product Details
+            <svg class="accordion-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+          <div class="accordion-body">
+            <ul id="product-details-list">
+              <!-- Populated by JS -->
+            </ul>
+          </div>
+        </div>
+
+        <div class="accordion-item" id="acc-shipping">
+          <button class="accordion-trigger" onclick="toggleAccordion('acc-shipping')">
+            Shipping & Returns
+            <svg class="accordion-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+          <div class="accordion-body">
+            <ul>
+              <li>Free standard shipping on orders over €150</li>
+              <li>Standard shipping: 3–5 business days</li>
+              <li>Express shipping available at checkout</li>
+              <li>Custom orders: 7–14 business days production</li>
+              <li>14-day returns on unworn, unaltered items</li>
+              <li>Contact us for custom order return policies</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="accordion-item" id="acc-care">
+          <button class="accordion-trigger" onclick="toggleAccordion('acc-care')">
+            Care Instructions
+            <svg class="accordion-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+          <div class="accordion-body">
+            <ul>
+              <li>Machine wash cold, inside out</li>
+              <li>Do not tumble dry — hang to dry</li>
+              <li>Do not bleach</li>
+              <li>Iron on low heat, avoid decorated areas</li>
+              <li>Custom rhinestone pieces: gentle hand wash recommended</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Related Products -->
+    <section class="related-section">
+      <div class="container">
+        <div class="section-label reveal">You May Also Like</div>
+        <h2 class="section-title reveal delay-1" style="font-size:clamp(40px,5vw,72px); margin-top:12px;">RELATED</h2>
+        <div class="related-grid stagger-in" id="related-grid">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom" style="border-top:none; padding-top:0;">
+        <div class="footer-copy">© 2024 SUREAL. All rights reserved.</div>
+        <div class="footer-legal"><a href="#">Privacy</a><a href="#">Terms</a></div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/products.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/animations.js"></script>
+  <script src="js/main.js"></script>
+
+  <script>
+    /* ── Product Page Logic ──────────────────── */
+    let selectedSize = null;
+    let qty = 1;
+    let currentProduct = null;
+
+    function toggleAccordion(id) {
+      const item = document.getElementById(id);
+      item.classList.toggle('open');
+    }
+
+    function initProductPage() {
+      const params  = new URLSearchParams(window.location.search);
+      const id      = params.get('id') || SUREAL_PRODUCTS[0].id;
+      const product = getProductById(id) || SUREAL_PRODUCTS[0];
+      currentProduct = product;
+
+      /* Page title */
+      document.title = product.name + ' — SUREAL';
+
+      /* Breadcrumb */
+      document.getElementById('breadcrumb-name').textContent = product.name;
+
+      /* Name & Price */
+      document.getElementById('product-main-name').textContent = product.name;
+      document.getElementById('price-current').textContent = formatPrice(product.price);
+
+      if (product.originalPrice) {
+        const orig = document.getElementById('price-original');
+        const save = document.getElementById('price-save');
+        orig.textContent = formatPrice(product.originalPrice);
+        orig.style.display = 'inline';
+        const pct = Math.round((1 - product.price / product.originalPrice) * 100);
+        save.textContent = '-' + pct + '%';
+        save.style.display = 'inline-flex';
+      }
+
+      /* Description */
+      document.getElementById('product-description').textContent = product.description;
+
+      /* Tag badge */
+      if (product.tag) {
+        const badge = document.getElementById('product-badge-tag');
+        badge.textContent = product.tag;
+        badge.style.display = 'inline-flex';
+      }
+
+      /* Gallery */
+      const mainEl = document.getElementById('gallery-main');
+      const thumbsEl = document.getElementById('gallery-thumbs');
+      document.getElementById('gallery-placeholder-text').textContent = product.placeholder;
+
+      const images = product.images && product.images.length > 0 ? product.images : [null];
+
+      /* Try to load first image */
+      if (images[0]) {
+        const img = new Image();
+        img.onload = () => {
+          mainEl.innerHTML = `<img src="${images[0]}" alt="${product.name}" id="gallery-main-img">
+            <div class="gallery-zoom-hint">HOVER TO ZOOM</div>`;
+          setupZoom();
+        };
+        img.onerror = () => {
+          mainEl.innerHTML = `<div class="product-img-placeholder"><span class="placeholder-label">${product.placeholder}</span></div>
+            <div class="gallery-zoom-hint">SUREAL</div>`;
+        };
+        img.src = images[0];
+      }
+
+      /* Thumbnails */
+      thumbsEl.innerHTML = images.map((src, i) => `
+        <div class="gallery-thumb ${i === 0 ? 'active' : ''}" onclick="switchImage(${i}, '${src}', '${product.placeholder}')">
+          ${src
+            ? `<img src="${src}" alt="View ${i+1}" onerror="this.parentElement.innerHTML='<div class=\\'product-img-placeholder\\'><span class=\\'placeholder-label\\'>${i+1}</span></div>'">`
+            : `<div class="product-img-placeholder"><span class="placeholder-label" style="font-size:18px;">${i+1}</span></div>`
+          }
+        </div>
+      `).join('');
+
+      /* Sizes */
+      const sizeGrid = document.getElementById('size-grid');
+      sizeGrid.innerHTML = product.sizes.map(size => `
+        <button
+          class="size-btn ${product.unavailableSizes.includes(size) ? 'unavailable' : ''}"
+          onclick="selectSize('${size}', this)"
+          ${product.unavailableSizes.includes(size) ? 'disabled' : ''}
+        >${size}</button>
+      `).join('');
+
+      /* Product details list */
+      const detailsList = document.getElementById('product-details-list');
+      detailsList.innerHTML = (product.details || []).map(d => `<li>${d}</li>`).join('');
+
+      /* Wishlist state */
+      if (typeof Auth !== 'undefined') {
+        const wishlisted = Auth.isWishlisted(product.id);
+        const wishBtn = document.getElementById('wishlist-btn');
+        if (wishlisted) {
+          wishBtn.style.borderColor = 'var(--gold)';
+          wishBtn.style.color = 'var(--gold)';
+          wishBtn.querySelector('path').setAttribute('fill', 'currentColor');
+        }
+      }
+
+      /* Related products */
+      renderRelated(product);
+    }
+
+    function switchImage(idx, src, placeholder) {
+      document.querySelectorAll('.gallery-thumb').forEach((t, i) => {
+        t.classList.toggle('active', i === idx);
+      });
+
+      const mainEl = document.getElementById('gallery-main');
+      const existing = mainEl.querySelector('img');
+
+      if (existing) existing.classList.add('switching');
+
+      setTimeout(() => {
+        if (src && src !== 'null') {
+          mainEl.innerHTML = `<img src="${src}" alt="Product view ${idx+1}" id="gallery-main-img" onerror="this.parentElement.innerHTML='<div class=\\'product-img-placeholder\\'><span class=\\'placeholder-label\\'>${placeholder}</span></div><div class=\\'gallery-zoom-hint\\'>SUREAL</div>'">
+            <div class="gallery-zoom-hint">HOVER TO ZOOM</div>`;
+          setupZoom();
+        } else {
+          mainEl.innerHTML = `<div class="product-img-placeholder"><span class="placeholder-label">${placeholder}</span></div>
+            <div class="gallery-zoom-hint">SUREAL</div>`;
+        }
+      }, 150);
+    }
+
+    function setupZoom() {
+      const mainEl = document.getElementById('gallery-main');
+      const img = mainEl.querySelector('img');
+      if (!img) return;
+
+      mainEl.addEventListener('mousemove', e => {
+        const rect = mainEl.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 100;
+        const y = ((e.clientY - rect.top) / rect.height) * 100;
+        img.style.transformOrigin = `${x}% ${y}%`;
+        img.style.transform = 'scale(1.5)';
+        img.style.transition = 'transform 0.1s ease';
+      });
+
+      mainEl.addEventListener('mouseleave', () => {
+        img.style.transform = 'scale(1)';
+        img.style.transition = 'transform 0.4s var(--ease-smooth)';
+      });
+    }
+
+    function selectSize(size, btn) {
+      document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      selectedSize = size;
+      document.getElementById('size-error').style.display = 'none';
+    }
+
+    /* Qty controls */
+    document.getElementById('qty-minus')?.addEventListener('click', () => {
+      qty = Math.max(1, qty - 1);
+      document.getElementById('qty-display').textContent = qty;
+    });
+
+    document.getElementById('qty-plus')?.addEventListener('click', () => {
+      qty = Math.min(10, qty + 1);
+      document.getElementById('qty-display').textContent = qty;
+    });
+
+    /* Add to cart */
+    document.getElementById('atc-btn')?.addEventListener('click', () => {
+      if (!selectedSize) {
+        document.getElementById('size-error').style.display = 'block';
+        document.getElementById('size-grid').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        return;
+      }
+      if (currentProduct) {
+        Cart.add(currentProduct, selectedSize, qty);
+      }
+    });
+
+    /* Wishlist */
+    document.getElementById('wishlist-btn')?.addEventListener('click', () => {
+      if (!currentProduct) return;
+      if (typeof Auth !== 'undefined') {
+        const added = Auth.toggleWishlist(currentProduct.id);
+        const btn = document.getElementById('wishlist-btn');
+        const path = btn.querySelector('path');
+        btn.style.borderColor = added ? 'var(--gold)' : '';
+        btn.style.color = added ? 'var(--gold)' : '';
+        if (path) path.setAttribute('fill', added ? 'currentColor' : 'none');
+        Cart.showToast(added ? 'Added to wishlist' : 'Removed from wishlist', 'info');
+      }
+    });
+
+    function renderRelated(product) {
+      const related = SUREAL_PRODUCTS.filter(p => p.id !== product.id).slice(0, 4);
+      const grid = document.getElementById('related-grid');
+      grid.innerHTML = related.map(p => {
+        const imgHTML = (p.images && p.images[0])
+          ? `<img src="${p.images[0]}" alt="${p.name}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\'product-img-placeholder\\'><span class=\\'placeholder-label\\'>${p.placeholder}</span></div>'">`
+          : `<div class="product-img-placeholder"><span class="placeholder-label">${p.placeholder}</span></div>`;
+
+        return `
+          <a href="product.html?id=${p.id}" class="product-card reveal">
+            <div class="product-img-wrap">
+              ${p.tag ? `<div class="product-tag ${p.tag==='NEW'?'new':''}">${p.tag}</div>` : ''}
+              ${imgHTML}
+              <div class="product-overlay"><button class="product-quick-add" onclick="handleQuickAdd(event,'${p.id}')">Quick Add +</button></div>
+            </div>
+            <div class="product-info">
+              <div class="product-name">${p.name}</div>
+              <div class="product-price-wrap"><span class="product-price">${formatPrice(p.price)}</span></div>
+            </div>
+          </a>
+        `;
+      }).join('');
+
+      requestAnimationFrame(() => {
+        const obs = new IntersectionObserver(e => e.forEach(entry => {
+          if (entry.isIntersecting) { entry.target.classList.add('visible'); obs.unobserve(entry.target); }
+        }), { threshold: 0.05 });
+        grid.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+      });
+    }
+
+    initProductPage();
+  </script>
+</body>
+</html>

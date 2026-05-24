@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact — SUREAL</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <style>
+    .contact-page { padding-top: var(--nav-height); }
+
+    .contact-hero {
+      padding: var(--space-3xl) 0 var(--space-xl);
+      background: var(--black-soft);
+      border-bottom: 1px solid var(--glass-border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .contact-hero-bg {
+      position: absolute;
+      right: -60px; top: 50%;
+      transform: translateY(-50%);
+      font-family: var(--font-display);
+      font-size: clamp(120px, 22vw, 340px);
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(255,255,255,0.04);
+      pointer-events: none;
+      user-select: none;
+      letter-spacing: 0.04em;
+    }
+
+    /* ── Layout ─── */
+    .contact-layout {
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      gap: 2px;
+      background: var(--glass-border);
+      min-height: 70vh;
+    }
+
+    /* ── Info Panel ─── */
+    .contact-info {
+      background: var(--dark-1);
+      padding: var(--space-3xl) var(--space-2xl);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2xl);
+    }
+
+    .contact-method {
+      display: flex;
+      gap: var(--space-md);
+      padding: var(--space-lg);
+      background: var(--dark-2);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      transition: border-color var(--t-med), transform var(--t-med) var(--ease-smooth);
+    }
+
+    .contact-method:hover {
+      border-color: var(--gold-dim);
+      transform: translateX(6px);
+    }
+
+    .contact-method-icon {
+      width: 44px; height: 44px;
+      border: 1px solid var(--gold-dim);
+      border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--gold);
+      flex-shrink: 0;
+    }
+
+    .contact-method-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gray-dim);
+      margin-bottom: 4px;
+    }
+
+    .contact-method-value {
+      font-family: var(--font-heading);
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--white);
+    }
+
+    .contact-socials-title {
+      font-family: var(--font-heading);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gray-mid);
+      margin-bottom: var(--space-md);
+    }
+
+    .contact-social-links {
+      display: flex;
+      gap: var(--space-sm);
+    }
+
+    .contact-social-btn {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      background: var(--dark-2);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      font-family: var(--font-heading);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gray-light);
+      transition: all var(--t-fast);
+      text-decoration: none;
+    }
+
+    .contact-social-btn:hover {
+      border-color: var(--gold-dim);
+      color: var(--gold);
+      background: rgba(200,169,110,0.05);
+    }
+
+    /* ── Form Panel ─── */
+    .contact-form-panel {
+      background: var(--black);
+      padding: var(--space-3xl) var(--space-2xl);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-md);
+    }
+
+    .form-row-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: var(--space-sm);
+    }
+
+    /* Subject chips */
+    .subject-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+    }
+
+    .subject-chip {
+      padding: 8px 16px;
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-pill);
+      font-family: var(--font-heading);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--gray-light);
+      transition: all var(--t-fast);
+      cursor: none;
+    }
+
+    .subject-chip:hover {
+      border-color: var(--glass-border-h);
+      color: var(--white);
+    }
+
+    .subject-chip.active {
+      background: var(--gold);
+      color: var(--black);
+      border-color: var(--gold);
+    }
+
+    /* ── Custom Order Section ─── */
+    .custom-cta-band {
+      background: var(--dark-1);
+      border-top: 1px solid var(--glass-border);
+      padding: var(--space-3xl) 0;
+    }
+
+    .custom-cta-inner {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: var(--space-2xl);
+    }
+
+    @media (max-width: 900px) {
+      .contact-layout { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      .form-row-3 { grid-template-columns: 1fr 1fr; }
+      .custom-cta-inner { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 500px) {
+      .form-row-3 { grid-template-columns: 1fr; }
+      .contact-social-links { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="scroll-progress"></div>
+  <div class="cursor-dot" id="cursor-dot"></div>
+  <div class="cursor-ring" id="cursor-ring"></div>
+  <div class="toast-container" id="toast-container"></div>
+
+  <div class="cart-overlay" id="cart-overlay"></div>
+  <div class="cart-drawer" id="cart-drawer">
+    <div class="cart-drawer-header">
+      <div class="cart-drawer-title t-display">CART</div>
+      <button class="cart-close" id="cart-close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="cart-empty hidden" id="cart-empty"><div class="cart-empty-icon">◻</div><div style="text-align:center"><div class="t-heading" style="font-size:18px;margin-bottom:8px;">Cart is empty</div><a href="shop.html" class="btn btn-outline btn-sm">Shop Now →</a></div></div>
+    <div class="cart-items" id="cart-items-list"></div>
+    <div class="cart-footer hidden" id="cart-footer">
+      <div class="cart-subtotal"><span class="cart-subtotal-label">Subtotal</span><span class="cart-subtotal-value" id="cart-subtotal-value">€0.00</span></div>
+      <button class="btn btn-primary btn-full btn-lg" id="cart-checkout-btn">Checkout →</button>
+    </div>
+  </div>
+
+  <nav class="nav" id="main-nav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">SUR<span>E</span>AL</a>
+      <div class="nav-links">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="shop.html" class="nav-link">Shop</a>
+        <a href="about.html" class="nav-link">About</a>
+        <a href="contact.html" class="nav-link active">Contact</a>
+      </div>
+      <div class="nav-actions">
+        <a href="auth.html" class="nav-icon-btn" id="nav-account-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></a>
+        <button class="nav-icon-btn" data-open-cart style="position:relative;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+          <span class="cart-count" id="cart-count-nav">0</span>
+        </button>
+        <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="mobile-nav" id="mobile-nav">
+    <div class="mobile-nav-links">
+      <a href="index.html" class="mobile-nav-link">Home</a>
+      <a href="shop.html" class="mobile-nav-link">Shop</a>
+      <a href="about.html" class="mobile-nav-link">About</a>
+      <a href="contact.html" class="mobile-nav-link">Contact</a>
+    </div>
+  </div>
+
+  <main class="contact-page page-transition">
+
+    <!-- Hero -->
+    <div class="contact-hero">
+      <div class="contact-hero-bg">TALK</div>
+      <div class="container" style="position:relative;z-index:1;">
+        <div class="section-label" style="opacity:1;transform:none;">Get In Touch</div>
+        <h1 class="t-display reveal" style="font-size:clamp(64px,12vw,180px); margin-top:12px; line-height:0.9; color:var(--white);">
+          LET'S<br><span style="color:var(--gold);">TALK.</span>
+        </h1>
+        <p class="reveal delay-2" style="font-size:16px; color:var(--gray-light); max-width:520px; line-height:1.7; margin-top:var(--space-lg);">
+          For custom orders, collaborations, press inquiries, or just to say hello — we're here. Expect a response within 24 hours.
+        </p>
+      </div>
+    </div>
+
+    <!-- Contact Layout -->
+    <div class="contact-layout">
+
+      <!-- Info Panel -->
+      <div class="contact-info">
+        <div>
+          <div class="t-label" style="color:var(--gray-mid); margin-bottom:var(--space-lg);">Contact Info</div>
+
+          <div class="contact-method reveal">
+            <div class="contact-method-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </div>
+            <div>
+              <div class="contact-method-label">Email</div>
+              <div class="contact-method-value">hello@sureal.studio</div>
+            </div>
+          </div>
+
+          <div class="contact-method reveal delay-1" style="margin-top:var(--space-sm);">
+            <div class="contact-method-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            </div>
+            <div>
+              <div class="contact-method-label">Studio</div>
+              <div class="contact-method-value">Antwerp, Belgium</div>
+            </div>
+          </div>
+
+          <div class="contact-method reveal delay-2" style="margin-top:var(--space-sm);">
+            <div class="contact-method-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div>
+              <div class="contact-method-label">Response Time</div>
+              <div class="contact-method-value">Within 24 hours</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="reveal delay-3">
+          <div class="contact-socials-title">Follow Us</div>
+          <div class="contact-social-links">
+            <a href="#" class="contact-social-btn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+              Instagram
+            </a>
+            <a href="#" class="contact-social-btn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.26 8.26 0 0 0 4.83 1.55V6.79a4.85 4.85 0 0 1-1.06-.1z"/></svg>
+              TikTok
+            </a>
+          </div>
+        </div>
+
+        <!-- Custom order CTA -->
+        <div class="glass reveal delay-4" style="padding:var(--space-lg); border-radius:var(--radius-lg);">
+          <div class="t-label" style="color:var(--gold); margin-bottom:var(--space-sm);">✦ Custom Order</div>
+          <p style="font-size:14px; color:var(--gray-light); line-height:1.7; margin-bottom:var(--space-md);">
+            Want something completely unique? Request a fully custom piece — rhinestones, paint, or embroidery on any garment.
+          </p>
+          <div style="font-family:var(--font-mono); font-size:11px; color:var(--gray-dim);">
+            PRODUCTION: 7–14 DAYS
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Panel -->
+      <div class="contact-form-panel">
+        <div class="t-label" style="color:var(--gray-mid); margin-bottom:var(--space-xl);">Send a Message</div>
+
+        <form id="contact-form" novalidate>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">First Name *</label>
+              <input type="text" class="form-input" id="cf-fname" placeholder="Enzo" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Last Name *</label>
+              <input type="text" class="form-input" id="cf-lname" placeholder="Rossi" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Email *</label>
+            <input type="email" class="form-input" id="cf-email" placeholder="your@email.com" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Subject</label>
+            <div class="subject-chips" id="subject-chips">
+              <button type="button" class="subject-chip active" data-val="General">General</button>
+              <button type="button" class="subject-chip" data-val="Custom Order">Custom Order</button>
+              <button type="button" class="subject-chip" data-val="Order Status">Order Status</button>
+              <button type="button" class="subject-chip" data-val="Collab">Collaboration</button>
+              <button type="button" class="subject-chip" data-val="Press">Press / Media</button>
+            </div>
+          </div>
+
+          <!-- Custom order extras (shown when "Custom Order" selected) -->
+          <div id="custom-order-fields" style="display:none;">
+            <div class="form-group">
+              <label class="form-label">Garment Type</label>
+              <div class="form-row-3">
+                <button type="button" class="subject-chip" data-garment="Shorts">Shorts</button>
+                <button type="button" class="subject-chip" data-garment="Jeans">Jeans</button>
+                <button type="button" class="subject-chip" data-garment="Jacket">Jacket</button>
+                <button type="button" class="subject-chip" data-garment="Hoodie">Hoodie</button>
+                <button type="button" class="subject-chip" data-garment="Tee">T-Shirt</button>
+                <button type="button" class="subject-chip" data-garment="Other">Other</button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Decoration Style</label>
+              <div class="form-row-3">
+                <button type="button" class="subject-chip" data-deco="Rhinestones">Rhinestones</button>
+                <button type="button" class="subject-chip" data-deco="Hand Paint">Hand Paint</button>
+                <button type="button" class="subject-chip" data-deco="Embroidery">Embroidery</button>
+                <button type="button" class="subject-chip" data-deco="Screen Print">Screen Print</button>
+                <button type="button" class="subject-chip" data-deco="Mixed">Mixed</button>
+                <button type="button" class="subject-chip" data-deco="Custom">Custom</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Message *</label>
+            <textarea class="form-input form-textarea" id="cf-message" placeholder="Tell us what you have in mind..." required></textarea>
+          </div>
+
+          <div style="display:flex; align-items:center; gap:var(--space-md); margin-bottom:var(--space-lg);">
+            <input type="checkbox" id="cf-consent" style="width:16px;height:16px;accent-color:var(--gold);">
+            <label for="cf-consent" style="font-size:12px; color:var(--gray-mid); line-height:1.5; cursor:none;">
+              I agree to be contacted by SUREAL regarding my inquiry.
+            </label>
+          </div>
+
+          <button type="submit" class="btn btn-gold btn-lg btn-full" id="contact-submit">
+            Send Message →
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Custom Order CTA Band -->
+    <section class="custom-cta-band">
+      <div class="container">
+        <div class="custom-cta-inner">
+          <div>
+            <div class="section-label reveal">Custom Commissions</div>
+            <h2 class="t-display reveal delay-1" style="font-size:clamp(40px,6vw,80px); margin-top:12px; color:var(--white); line-height:0.9;">
+              YOUR VISION.<br><span style="color:var(--gold);">OUR HANDS.</span>
+            </h2>
+            <p class="reveal delay-2" style="font-size:15px; color:var(--gray-light); max-width:480px; line-height:1.8; margin-top:16px;">
+              Every custom order starts with a conversation. Tell us your idea — however crazy — and we'll make it real.
+            </p>
+          </div>
+          <div class="reveal delay-3">
+            <a href="#contact-form" class="btn btn-primary btn-lg magnetic">
+              Start Your Order →
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom" style="border-top:none;padding-top:0;">
+        <div class="footer-copy">© 2024 SUREAL. All rights reserved.</div>
+        <div class="footer-legal"><a href="#">Privacy</a><a href="#">Terms</a></div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/products.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/animations.js"></script>
+  <script src="js/main.js"></script>
+
+  <script>
+    let selectedSubject = 'General';
+
+    /* Subject chips */
+    document.querySelectorAll('[data-val]').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('[data-val]').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        selectedSubject = chip.dataset.val;
+
+        const customFields = document.getElementById('custom-order-fields');
+        customFields.style.display = selectedSubject === 'Custom Order' ? 'block' : 'none';
+      });
+    });
+
+    /* Garment / deco single-select */
+    ['garment', 'deco'].forEach(type => {
+      document.querySelectorAll(`[data-${type}]`).forEach(chip => {
+        chip.addEventListener('click', () => {
+          document.querySelectorAll(`[data-${type}]`).forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+        });
+      });
+    });
+
+    /* Form submit */
+    document.getElementById('contact-form').addEventListener('submit', e => {
+      e.preventDefault();
+
+      const fname   = document.getElementById('cf-fname').value.trim();
+      const lname   = document.getElementById('cf-lname').value.trim();
+      const email   = document.getElementById('cf-email').value.trim();
+      const message = document.getElementById('cf-message').value.trim();
+      const consent = document.getElementById('cf-consent').checked;
+
+      if (!fname || !lname) { Cart.showToast('Please enter your name.', 'error'); return; }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { Cart.showToast('Please enter a valid email.', 'error'); return; }
+      if (!message) { Cart.showToast('Please write a message.', 'error'); return; }
+      if (!consent) { Cart.showToast('Please agree to be contacted.', 'error'); return; }
+
+      const btn = document.getElementById('contact-submit');
+      btn.textContent = 'Sending...';
+      btn.disabled = true;
+
+      /* Simulate send (replace with real API) */
+      setTimeout(() => {
+        Cart.showToast('Message sent! We\'ll reply within 24 hours.', 'success');
+        document.getElementById('contact-form').reset();
+        document.querySelectorAll('.subject-chip').forEach(c => c.classList.remove('active'));
+        document.querySelector('[data-val="General"]').classList.add('active');
+        selectedSubject = 'General';
+        document.getElementById('custom-order-fields').style.display = 'none';
+        btn.textContent = 'Send Message →';
+        btn.disabled = false;
+      }, 1200);
+    });
+  </script>
+</body>
+</html>

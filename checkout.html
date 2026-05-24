@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout — SUREAL</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <style>
+    .checkout-page {
+      padding-top: var(--nav-height);
+      min-height: 100vh;
+      background: var(--black);
+    }
+
+    /* ── Steps ─── */
+    .checkout-steps {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      padding: var(--space-lg) 0;
+      border-bottom: 1px solid var(--glass-border);
+      background: var(--black-soft);
+    }
+
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .step-num {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      border: 1.5px solid var(--glass-border);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--gray-dim);
+      transition: all var(--t-med);
+      flex-shrink: 0;
+    }
+
+    .step.active .step-num {
+      border-color: var(--gold);
+      background: var(--gold);
+      color: var(--black);
+      font-weight: 700;
+    }
+
+    .step.done .step-num {
+      border-color: #4CAF50;
+      background: rgba(76,175,80,0.1);
+      color: #4CAF50;
+    }
+
+    .step-label {
+      font-family: var(--font-heading);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--gray-dim);
+      transition: color var(--t-med);
+    }
+
+    .step.active .step-label { color: var(--white); }
+    .step.done  .step-label  { color: var(--gray-light); }
+
+    .step-connector {
+      width: clamp(40px, 6vw, 80px);
+      height: 1px;
+      background: var(--glass-border);
+      margin: 0 8px;
+    }
+
+    /* ── Layout ─── */
+    .checkout-layout {
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      gap: 2px;
+      background: var(--glass-border);
+      min-height: calc(100vh - var(--nav-height) - 65px);
+    }
+
+    /* ── Form Column ─── */
+    .checkout-form-col {
+      background: var(--black);
+      padding: var(--space-2xl) var(--space-2xl);
+    }
+
+    .checkout-step-panel { display: none; animation: fade-up 0.4s var(--ease-smooth) both; }
+    .checkout-step-panel.active { display: block; }
+
+    .checkout-section-title {
+      font-family: var(--font-display);
+      font-size: 32px;
+      letter-spacing: 0.06em;
+      color: var(--white);
+      margin-bottom: var(--space-xl);
+    }
+
+    .form-row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-md);
+    }
+
+    /* Payment cards */
+    .payment-methods {
+      display: flex;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-xl);
+      flex-wrap: wrap;
+    }
+
+    .payment-method {
+      flex: 1;
+      min-width: 120px;
+      padding: 14px 16px;
+      border: 1.5px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--font-heading);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gray-light);
+      transition: all var(--t-fast);
+      cursor: none;
+    }
+
+    .payment-method.active {
+      border-color: var(--gold);
+      color: var(--white);
+      background: rgba(200,169,110,0.06);
+    }
+
+    .payment-method:hover:not(.active) {
+      border-color: var(--glass-border-h);
+      color: var(--white);
+    }
+
+    .card-inputs {
+      display: none;
+    }
+
+    .card-inputs.active { display: block; }
+
+    /* Card number styling */
+    .card-num-wrap {
+      position: relative;
+    }
+
+    .card-brand-icon {
+      position: absolute;
+      right: 14px; top: 50%;
+      transform: translateY(-50%);
+      font-size: 20px;
+      pointer-events: none;
+    }
+
+    /* ── Summary Column ─── */
+    .checkout-summary-col {
+      background: var(--dark-1);
+      padding: var(--space-2xl);
+      position: sticky;
+      top: var(--nav-height);
+      height: fit-content;
+    }
+
+    .summary-title {
+      font-family: var(--font-display);
+      font-size: 24px;
+      letter-spacing: 0.08em;
+      color: var(--white);
+      margin-bottom: var(--space-lg);
+    }
+
+    .summary-items {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+      margin-bottom: var(--space-lg);
+    }
+
+    .summary-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+
+    .summary-item-img {
+      width: 64px; height: 80px;
+      border-radius: var(--radius-md);
+      background: var(--dark-2);
+      overflow: hidden;
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .summary-item-img img { width: 100%; height: 100%; object-fit: cover; }
+
+    .summary-item-qty {
+      position: absolute;
+      top: -6px; right: -6px;
+      width: 20px; height: 20px;
+      background: var(--gold);
+      color: var(--black);
+      border-radius: 50%;
+      font-size: 10px;
+      font-weight: 700;
+      font-family: var(--font-heading);
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .summary-item-name {
+      font-family: var(--font-heading);
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 3px;
+    }
+
+    .summary-item-variant {
+      font-size: 12px;
+      color: var(--gray-mid);
+      margin-bottom: 4px;
+    }
+
+    .summary-item-price {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      color: var(--white);
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+
+    .summary-divider { height: 1px; background: var(--glass-border); margin: var(--space-md) 0; }
+
+    .summary-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+
+    .summary-line-label { color: var(--gray-mid); }
+    .summary-line-value { font-family: var(--font-mono); color: var(--white); }
+
+    .summary-total {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: var(--space-md);
+    }
+
+    .summary-total-label {
+      font-family: var(--font-heading);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .summary-total-value {
+      font-family: var(--font-display);
+      font-size: 36px;
+      color: var(--white);
+      letter-spacing: 0.04em;
+    }
+
+    /* ── Confirmation ─── */
+    .order-confirmed {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: var(--space-3xl) var(--space-xl);
+      min-height: 80vh;
+      animation: fade-up 0.6s var(--ease-smooth) both;
+    }
+
+    .confirmed-icon {
+      width: 88px; height: 88px;
+      border-radius: 50%;
+      background: rgba(76,175,80,0.1);
+      border: 2px solid #4CAF50;
+      display: flex; align-items: center; justify-content: center;
+      color: #4CAF50;
+      font-size: 36px;
+      margin-bottom: var(--space-xl);
+      animation: scale-in 0.5s var(--ease-bounce) 0.2s both;
+    }
+
+    .confirmed-order-id {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      letter-spacing: 0.15em;
+      color: var(--gold);
+      margin-bottom: var(--space-md);
+    }
+
+    /* Promo code */
+    .promo-row {
+      display: flex;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-md);
+    }
+
+    .promo-row .form-input { flex: 1; padding: 10px 14px; font-size: 13px; }
+    .promo-row .btn { padding: 10px 16px; font-size: 12px; }
+
+    /* ── Responsive ─── */
+    @media (max-width: 1000px) {
+      .checkout-layout { grid-template-columns: 1fr; }
+      .checkout-summary-col { position: static; order: -1; border-bottom: 1px solid var(--glass-border); }
+    }
+
+    @media (max-width: 600px) {
+      .form-row-2 { grid-template-columns: 1fr; }
+      .checkout-form-col { padding: var(--space-lg) var(--gutter); }
+      .checkout-summary-col { padding: var(--space-lg) var(--gutter); }
+      .payment-methods { flex-direction: column; }
+      .checkout-steps { gap: 0; }
+      .step-label { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="cursor-dot" id="cursor-dot"></div>
+  <div class="cursor-ring" id="cursor-ring"></div>
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Minimal nav -->
+  <nav style="position:fixed;top:0;left:0;right:0;z-index:100;height:var(--nav-height);display:flex;align-items:center;justify-content:space-between;padding:0 var(--gutter);background:var(--glass-dark);backdrop-filter:blur(24px);border-bottom:1px solid var(--glass-border);">
+    <a href="index.html" style="font-family:var(--font-display);font-size:24px;letter-spacing:0.12em;color:var(--white);">SUR<span style="color:var(--gold);">E</span>AL</a>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <span style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.15em;color:var(--gray-mid);">SECURE CHECKOUT</span>
+    </div>
+  </nav>
+
+  <div class="checkout-page page-transition" id="checkout-page">
+
+    <!-- Steps -->
+    <div class="checkout-steps" id="checkout-steps">
+      <div class="step active" id="step-info">
+        <div class="step-num">1</div>
+        <div class="step-label">Info</div>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step" id="step-shipping">
+        <div class="step-num">2</div>
+        <div class="step-label">Shipping</div>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step" id="step-payment">
+        <div class="step-num">3</div>
+        <div class="step-label">Payment</div>
+      </div>
+    </div>
+
+    <div class="checkout-layout" id="checkout-layout">
+
+      <!-- Form Column -->
+      <div class="checkout-form-col">
+
+        <!-- Step 1: Contact Info -->
+        <div class="checkout-step-panel active" id="step-panel-1">
+          <div class="checkout-section-title">CONTACT INFO</div>
+          <form id="info-form">
+            <div class="form-row-2">
+              <div class="form-group">
+                <label class="form-label">First Name *</label>
+                <input type="text" class="form-input" id="co-fname" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Last Name *</label>
+                <input type="text" class="form-input" id="co-lname" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email *</label>
+              <input type="email" class="form-input" id="co-email" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Phone (optional)</label>
+              <input type="tel" class="form-input" id="co-phone" placeholder="+32 ...">
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:var(--space-xl);">
+              <input type="checkbox" id="co-newsletter" style="width:16px;height:16px;accent-color:var(--gold);" checked>
+              <label for="co-newsletter" style="font-size:12px;color:var(--gray-mid);cursor:none;">Get early access to new drops and exclusive offers.</label>
+            </div>
+            <button type="submit" class="btn btn-primary btn-full btn-lg">
+              Continue to Shipping →
+            </button>
+          </form>
+        </div>
+
+        <!-- Step 2: Shipping -->
+        <div class="checkout-step-panel" id="step-panel-2">
+          <div class="checkout-section-title">SHIPPING</div>
+          <form id="shipping-form">
+            <div class="form-group">
+              <label class="form-label">Address *</label>
+              <input type="text" class="form-input" id="co-address" placeholder="Street and number" required>
+            </div>
+            <div class="form-row-2">
+              <div class="form-group">
+                <label class="form-label">Postal Code *</label>
+                <input type="text" class="form-input" id="co-zip" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">City *</label>
+                <input type="text" class="form-input" id="co-city" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Country *</label>
+              <select class="form-input form-select" id="co-country">
+                <option value="BE">Belgium</option>
+                <option value="NL">Netherlands</option>
+                <option value="DE">Germany</option>
+                <option value="FR">France</option>
+                <option value="GB">United Kingdom</option>
+                <option value="US">United States</option>
+                <option value="OTHER">Other</option>
+              </select>
+            </div>
+
+            <div style="margin:var(--space-xl) 0 var(--space-lg);">
+              <div class="t-label" style="margin-bottom:var(--space-md); color:var(--gray-mid);">Shipping Method</div>
+              <div style="display:flex;flex-direction:column;gap:var(--space-sm);" id="shipping-methods">
+                <label style="display:flex;align-items:center;gap:var(--space-md);padding:var(--space-md) var(--space-lg);background:var(--dark-1);border:1.5px solid var(--gold);border-radius:var(--radius-lg);cursor:none;">
+                  <input type="radio" name="shipping" value="standard" checked style="accent-color:var(--gold);">
+                  <div style="flex:1;">
+                    <div style="font-family:var(--font-heading);font-size:14px;font-weight:600;">Standard — 3–5 days</div>
+                    <div style="font-size:12px;color:var(--gray-mid);">Free on orders over €150</div>
+                  </div>
+                  <div class="shipping-price" style="font-family:var(--font-mono);font-size:14px;" data-price="4.95">€4.95</div>
+                </label>
+                <label style="display:flex;align-items:center;gap:var(--space-md);padding:var(--space-md) var(--space-lg);background:var(--dark-1);border:1.5px solid var(--glass-border);border-radius:var(--radius-lg);cursor:none; transition:border-color 0.2s;">
+                  <input type="radio" name="shipping" value="express" style="accent-color:var(--gold);">
+                  <div style="flex:1;">
+                    <div style="font-family:var(--font-heading);font-size:14px;font-weight:600;">Express — 1–2 days</div>
+                    <div style="font-size:12px;color:var(--gray-mid);">Priority handling</div>
+                  </div>
+                  <div class="shipping-price" style="font-family:var(--font-mono);font-size:14px;" data-price="12.95">€12.95</div>
+                </label>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:var(--space-sm);">
+              <button type="button" class="btn btn-outline" onclick="goToStep(1)">← Back</button>
+              <button type="submit" class="btn btn-primary" style="flex:1;">Continue to Payment →</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Step 3: Payment -->
+        <div class="checkout-step-panel" id="step-panel-3">
+          <div class="checkout-section-title">PAYMENT</div>
+          <form id="payment-form">
+            <div class="payment-methods">
+              <button type="button" class="payment-method active" data-method="card" onclick="selectPayment('card', this)">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                Card
+              </button>
+              <button type="button" class="payment-method" data-method="paypal" onclick="selectPayment('paypal', this)">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.5 4.5c1.3 1 1.9 2.6 1.5 4.5-.7 3.1-3.4 4.5-6.5 4.5H10l-.8 5H6.5l2.7-14h6c1.2 0 2.1.4 2.3 0z"/></svg>
+                PayPal
+              </button>
+              <button type="button" class="payment-method" data-method="bancontact" onclick="selectPayment('bancontact', this)">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M7 12h4l2-4 2 8 2-4h2"/></svg>
+                Bancontact
+              </button>
+            </div>
+
+            <!-- Card inputs -->
+            <div class="card-inputs active" id="card-inputs">
+              <div class="form-group">
+                <label class="form-label">Card Number</label>
+                <div class="card-num-wrap">
+                  <input type="text" class="form-input" id="co-cardnum" placeholder="1234 5678 9012 3456" maxlength="19" style="padding-right:48px;">
+                  <div class="card-brand-icon" id="card-brand">💳</div>
+                </div>
+              </div>
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label class="form-label">Expiry</label>
+                  <input type="text" class="form-input" id="co-expiry" placeholder="MM / YY" maxlength="7">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">CVV</label>
+                  <input type="text" class="form-input" id="co-cvv" placeholder="123" maxlength="4">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Name on Card</label>
+                <input type="text" class="form-input" id="co-cardname" placeholder="ENZO ROSSI">
+              </div>
+            </div>
+
+            <!-- PayPal placeholder -->
+            <div id="paypal-placeholder" style="display:none; padding:var(--space-xl); text-align:center; background:var(--dark-1); border:1px solid var(--glass-border); border-radius:var(--radius-lg); margin-bottom:var(--space-xl);">
+              <p style="font-size:14px; color:var(--gray-light);">You'll be redirected to PayPal to complete your payment.</p>
+            </div>
+
+            <!-- Bancontact placeholder -->
+            <div id="bancontact-placeholder" style="display:none; padding:var(--space-xl); text-align:center; background:var(--dark-1); border:1px solid var(--glass-border); border-radius:var(--radius-lg); margin-bottom:var(--space-xl);">
+              <p style="font-size:14px; color:var(--gray-light);">Bancontact payment will open in a secure window.</p>
+            </div>
+
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:var(--space-lg);">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <span style="font-size:12px; color:var(--gray-dim);">Your payment info is encrypted and never stored.</span>
+            </div>
+
+            <div style="display:flex;gap:var(--space-sm);">
+              <button type="button" class="btn btn-outline" onclick="goToStep(2)">← Back</button>
+              <button type="submit" class="btn btn-gold" style="flex:1;" id="place-order-btn">
+                Place Order →
+              </button>
+            </div>
+          </form>
+        </div>
+
+      </div>
+
+      <!-- Summary Column -->
+      <div class="checkout-summary-col">
+        <div class="summary-title">ORDER SUMMARY</div>
+
+        <div class="summary-items" id="summary-items">
+          <!-- Populated by JS -->
+        </div>
+
+        <div class="promo-row">
+          <input type="text" class="form-input" id="promo-input" placeholder="Promo code">
+          <button class="btn btn-outline btn-sm" onclick="applyPromo()">Apply</button>
+        </div>
+
+        <div class="summary-divider"></div>
+
+        <div class="summary-line">
+          <span class="summary-line-label">Subtotal</span>
+          <span class="summary-line-value" id="summary-subtotal">€0.00</span>
+        </div>
+        <div class="summary-line">
+          <span class="summary-line-label">Shipping</span>
+          <span class="summary-line-value" id="summary-shipping">€4.95</span>
+        </div>
+        <div class="summary-line" id="discount-line" style="display:none;">
+          <span class="summary-line-label" style="color:#4CAF50;">Discount</span>
+          <span class="summary-line-value" style="color:#4CAF50;" id="summary-discount">-€0.00</span>
+        </div>
+
+        <div class="summary-divider"></div>
+
+        <div class="summary-total">
+          <span class="summary-total-label">Total</span>
+          <span class="summary-total-value" id="summary-total">€0.00</span>
+        </div>
+
+        <div style="margin-top:var(--space-lg); padding:var(--space-md); background:rgba(200,169,110,0.06); border:1px solid var(--gold-dim); border-radius:var(--radius-md);">
+          <div style="font-family:var(--font-mono); font-size:10px; letter-spacing:0.15em; color:var(--gold); margin-bottom:4px;">HANDCRAFTED FOR YOU</div>
+          <div style="font-size:12px; color:var(--gray-mid); line-height:1.6;">Each SUREAL piece is made by hand. Custom orders may take 7–14 additional days.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Order Confirmed -->
+    <div class="order-confirmed" id="order-confirmed">
+      <div class="confirmed-icon">✓</div>
+      <div class="confirmed-order-id" id="confirmed-order-id">#ORD000000</div>
+      <h1 class="t-display" style="font-size:clamp(48px,8vw,100px); color:var(--white); margin-bottom:var(--space-md);">ORDER<br>CONFIRMED.</h1>
+      <p style="font-size:16px; color:var(--gray-light); max-width:480px; line-height:1.8; margin-bottom:var(--space-xl);">
+        Your piece is now in the hands of our artisans. You'll receive a confirmation email with tracking info once it ships.
+      </p>
+      <div style="display:flex;gap:var(--space-md);flex-wrap:wrap;justify-content:center;">
+        <a href="account.html" class="btn btn-primary btn-lg">Track Order →</a>
+        <a href="shop.html" class="btn btn-outline btn-lg">Continue Shopping</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/products.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/animations.js"></script>
+  <script src="js/main.js"></script>
+
+  <script>
+    let currentStep = 1;
+    let shippingCost = 4.95;
+    let discount = 0;
+    let selectedPaymentMethod = 'card';
+
+    /* Redirect if cart empty */
+    document.addEventListener('DOMContentLoaded', () => {
+      if (Cart.getCount() === 0) {
+        window.location.href = 'shop.html';
+      }
+      renderSummary();
+
+      /* Pre-fill email if logged in */
+      const user = Auth.currentUser();
+      if (user) {
+        document.getElementById('co-email').value = user.email;
+        const nameParts = user.name.split(' ');
+        if (nameParts[0]) document.getElementById('co-fname').value = nameParts[0];
+        if (nameParts[1]) document.getElementById('co-lname').value = nameParts[1];
+      }
+    });
+
+    function renderSummary() {
+      const items    = Cart.getItems();
+      const subtotal = Cart.getSubtotal();
+      const total    = subtotal + shippingCost - discount;
+
+      /* Free shipping threshold */
+      if (subtotal >= 150) {
+        shippingCost = 0;
+        document.getElementById('summary-shipping').textContent = 'FREE';
+      } else {
+        document.getElementById('summary-shipping').textContent = '€' + shippingCost.toFixed(2);
+      }
+
+      document.getElementById('summary-subtotal').textContent = formatPrice(subtotal);
+      document.getElementById('summary-total').textContent    = formatPrice(Math.max(0, total));
+
+      document.getElementById('summary-items').innerHTML = items.map(item => `
+        <div class="summary-item">
+          <div class="summary-item-img">
+            ${item.image
+              ? `<img src="${item.image}" alt="${item.name}" onerror="this.parentElement.innerHTML='<div style=\\'width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:10px;color:var(--dark-4);\\'>SR</div>'">`
+              : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:10px;color:var(--dark-4);">SR</div>`
+            }
+            <div class="summary-item-qty">${item.qty}</div>
+          </div>
+          <div style="flex:1;">
+            <div class="summary-item-name">${item.name}</div>
+            <div class="summary-item-variant">Size: ${item.size}</div>
+          </div>
+          <div class="summary-item-price">${formatPrice(item.price * item.qty)}</div>
+        </div>
+      `).join('');
+    }
+
+    /* Step navigation */
+    function goToStep(n) {
+      currentStep = n;
+      document.querySelectorAll('.checkout-step-panel').forEach((p, i) => {
+        p.classList.toggle('active', i + 1 === n);
+      });
+
+      const stepEls = ['step-info', 'step-shipping', 'step-payment'];
+      stepEls.forEach((id, i) => {
+        const el = document.getElementById(id);
+        el.classList.remove('active', 'done');
+        if (i + 1 === n) el.classList.add('active');
+        if (i + 1 < n)  el.classList.add('done');
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* Shipping method toggle */
+    document.querySelectorAll('input[name="shipping"]').forEach(radio => {
+      radio.addEventListener('change', () => {
+        document.querySelectorAll('label').forEach(l => {
+          if (l.querySelector('input[name="shipping"]')) {
+            l.style.borderColor = l.querySelector('input[name="shipping"]').checked
+              ? 'var(--gold)' : 'var(--glass-border)';
+          }
+        });
+        shippingCost = parseFloat(radio.closest('label').querySelector('.shipping-price').dataset.price);
+        if (Cart.getSubtotal() >= 150 && radio.value === 'standard') shippingCost = 0;
+        renderSummary();
+      });
+    });
+
+    /* Payment method selection */
+    function selectPayment(method, btn) {
+      selectedPaymentMethod = method;
+      document.querySelectorAll('.payment-method').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('card-inputs').classList.toggle('active', method === 'card');
+      document.getElementById('paypal-placeholder').style.display    = method === 'paypal' ? 'block' : 'none';
+      document.getElementById('bancontact-placeholder').style.display = method === 'bancontact' ? 'block' : 'none';
+    }
+
+    /* Card number formatting */
+    document.getElementById('co-cardnum')?.addEventListener('input', e => {
+      let val = e.target.value.replace(/\D/g,'').substring(0,16);
+      val = val.replace(/(.{4})/g,'$1 ').trim();
+      e.target.value = val;
+
+      const brand = document.getElementById('card-brand');
+      if (val.startsWith('4')) brand.textContent = '💳';
+      else if (val.startsWith('5')) brand.textContent = '💳';
+      else brand.textContent = '💳';
+    });
+
+    document.getElementById('co-expiry')?.addEventListener('input', e => {
+      let val = e.target.value.replace(/\D/g,'').substring(0,4);
+      if (val.length > 2) val = val.substring(0,2) + ' / ' + val.substring(2);
+      e.target.value = val;
+    });
+
+    /* Promo code */
+    function applyPromo() {
+      const code = document.getElementById('promo-input').value.trim().toUpperCase();
+      const codes = { 'SUREAL10': 0.10, 'SUREAL20': 0.20, 'NEWDROP': 0.15 };
+      if (codes[code]) {
+        discount = Cart.getSubtotal() * codes[code];
+        document.getElementById('discount-line').style.display = 'flex';
+        document.getElementById('summary-discount').textContent = '-' + formatPrice(discount);
+        renderSummary();
+        Cart.showToast('Promo applied! ' + (codes[code]*100).toFixed(0) + '% off.', 'success');
+      } else {
+        Cart.showToast('Invalid promo code.', 'error');
+      }
+    }
+
+    /* Form submissions */
+    document.getElementById('info-form').addEventListener('submit', e => {
+      e.preventDefault();
+      const fname = document.getElementById('co-fname').value.trim();
+      const email = document.getElementById('co-email').value.trim();
+      if (!fname) { Cart.showToast('Please enter your name.', 'error'); return; }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { Cart.showToast('Please enter a valid email.', 'error'); return; }
+      goToStep(2);
+    });
+
+    document.getElementById('shipping-form').addEventListener('submit', e => {
+      e.preventDefault();
+      const address = document.getElementById('co-address').value.trim();
+      const zip     = document.getElementById('co-zip').value.trim();
+      const city    = document.getElementById('co-city').value.trim();
+      if (!address || !zip || !city) { Cart.showToast('Please fill in your full address.', 'error'); return; }
+      goToStep(3);
+    });
+
+    document.getElementById('payment-form').addEventListener('submit', e => {
+      e.preventDefault();
+
+      if (selectedPaymentMethod === 'card') {
+        const num  = document.getElementById('co-cardnum').value.replace(/\s/g,'');
+        const exp  = document.getElementById('co-expiry').value;
+        const cvv  = document.getElementById('co-cvv').value;
+        if (num.length < 16) { Cart.showToast('Please enter a valid card number.', 'error'); return; }
+        if (!exp.includes('/'))  { Cart.showToast('Please enter the expiry date.', 'error'); return; }
+        if (cvv.length < 3)  { Cart.showToast('Please enter the CVV.', 'error'); return; }
+      }
+
+      const btn = document.getElementById('place-order-btn');
+      btn.textContent = 'Processing...';
+      btn.disabled = true;
+
+      /* Simulate payment processing */
+      setTimeout(() => {
+        const orderId = '#ORD' + Date.now().toString().slice(-8);
+
+        if (Auth.isLoggedIn()) {
+          Auth.saveOrder({
+            id: orderId,
+            items: Cart.getItems(),
+            total: Cart.getSubtotal() + shippingCost - discount,
+            status: 'processing'
+          });
+        }
+
+        Cart.clear();
+
+        /* Show confirmation */
+        document.getElementById('checkout-layout').style.display = 'none';
+        document.getElementById('checkout-steps').style.display  = 'none';
+        const conf = document.getElementById('order-confirmed');
+        conf.style.display = 'flex';
+        document.getElementById('confirmed-order-id').textContent = orderId;
+
+        btn.textContent = 'Place Order →';
+        btn.disabled    = false;
+      }, 2000);
+    });
+  </script>
+</body>
+</html>
